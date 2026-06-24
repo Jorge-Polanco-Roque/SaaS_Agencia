@@ -1,0 +1,158 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    /* Marca JSM: azul ejecutivo */
+    --primary: 222 73% 48%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 262 83% 58%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 222 73% 48%;
+    --radius: 0.6rem;
+  }
+
+  .dark {
+    --background: 222 47% 8%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 262 83% 66%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 63% 50%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 33% 20%;
+    --input: 217 33% 20%;
+    --ring: 217 91% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Accesibilidad: respetar "movimiento reducido" para todas las animaciones. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   Temas (alto contraste, diversos). Se aplican con [data-theme]
+   en <html>. :root = Índigo (claro) por defecto.
+   ============================================================ */
+@layer base {
+  /* 1 · Índigo (claro) — explícito para reset desde otros temas */
+  [data-theme="indigo"] {
+    --background: 0 0% 100%; --foreground: 222 47% 11%;
+    --card: 0 0% 100%; --card-foreground: 222 47% 11%;
+    --primary: 222 73% 48%; --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 96%; --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%; --muted-foreground: 215 16% 47%;
+    --accent: 262 83% 58%; --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%; --destructive-foreground: 0 0% 100%;
+    --border: 214 32% 91%; --input: 214 32% 91%; --ring: 222 73% 48%;
+  }
+
+  /* 2 · Esmeralda (claro) */
+  [data-theme="esmeralda"] {
+    --background: 152 40% 98%; --foreground: 158 64% 11%;
+    --card: 0 0% 100%; --card-foreground: 158 64% 11%;
+    --primary: 160 84% 30%; --primary-foreground: 0 0% 100%;
+    --secondary: 152 30% 93%; --secondary-foreground: 158 64% 13%;
+    --muted: 152 30% 93%; --muted-foreground: 155 18% 38%;
+    --accent: 173 80% 33%; --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 48%; --destructive-foreground: 0 0% 100%;
+    --border: 152 25% 86%; --input: 152 25% 86%; --ring: 160 84% 30%;
+  }
+
+  /* 3 · Carmesí (claro) */
+  [data-theme="carmesi"] {
+    --background: 0 0% 100%; --foreground: 0 0% 9%;
+    --card: 0 0% 100%; --card-foreground: 0 0% 9%;
+    --primary: 347 80% 40%; --primary-foreground: 0 0% 100%;
+    --secondary: 350 35% 96%; --secondary-foreground: 0 0% 11%;
+    --muted: 350 22% 95%; --muted-foreground: 350 8% 38%;
+    --accent: 22 90% 45%; --accent-foreground: 0 0% 100%;
+    --destructive: 0 75% 45%; --destructive-foreground: 0 0% 100%;
+    --border: 350 22% 88%; --input: 350 22% 88%; --ring: 347 80% 40%;
+  }
+
+  /* 4 · Solar (claro) — naranja + marino */
+  [data-theme="solar"] {
+    --background: 40 50% 98%; --foreground: 222 47% 11%;
+    --card: 0 0% 100%; --card-foreground: 222 47% 11%;
+    --primary: 222 60% 20%; --primary-foreground: 0 0% 100%;
+    --secondary: 40 45% 91%; --secondary-foreground: 222 47% 14%;
+    --muted: 40 35% 91%; --muted-foreground: 35 12% 36%;
+    --accent: 28 95% 48%; --accent-foreground: 222 47% 11%;
+    --destructive: 0 72% 48%; --destructive-foreground: 0 0% 100%;
+    --border: 40 30% 84%; --input: 40 30% 84%; --ring: 28 95% 48%;
+  }
+
+  /* 5 · Medianoche (oscuro) — cian */
+  [data-theme="medianoche"] {
+    --background: 222 47% 7%; --foreground: 210 40% 96%;
+    --card: 222 44% 11%; --card-foreground: 210 40% 96%;
+    --primary: 190 95% 45%; --primary-foreground: 222 47% 8%;
+    --secondary: 217 33% 17%; --secondary-foreground: 210 40% 96%;
+    --muted: 217 33% 16%; --muted-foreground: 215 20% 68%;
+    --accent: 199 89% 55%; --accent-foreground: 222 47% 8%;
+    --destructive: 0 63% 52%; --destructive-foreground: 0 0% 100%;
+    --border: 217 33% 22%; --input: 217 33% 22%; --ring: 190 95% 45%;
+  }
+
+  /* 6 · Grafito (oscuro) — ámbar */
+  [data-theme="grafito"] {
+    --background: 30 8% 9%; --foreground: 40 30% 94%;
+    --card: 30 8% 13%; --card-foreground: 40 30% 94%;
+    --primary: 38 95% 52%; --primary-foreground: 30 25% 10%;
+    --secondary: 30 6% 18%; --secondary-foreground: 40 30% 92%;
+    --muted: 30 6% 17%; --muted-foreground: 35 12% 62%;
+    --accent: 22 90% 55%; --accent-foreground: 30 25% 10%;
+    --destructive: 0 70% 55%; --destructive-foreground: 0 0% 100%;
+    --border: 30 6% 24%; --input: 30 6% 24%; --ring: 38 95% 52%;
+  }
+
+  /* 7 · Orquídea (oscuro) — violeta/magenta */
+  [data-theme="orquidea"] {
+    --background: 270 30% 8%; --foreground: 280 30% 96%;
+    --card: 270 28% 12%; --card-foreground: 280 30% 96%;
+    --primary: 280 90% 64%; --primary-foreground: 0 0% 100%;
+    --secondary: 270 25% 18%; --secondary-foreground: 280 30% 95%;
+    --muted: 270 20% 17%; --muted-foreground: 280 14% 68%;
+    --accent: 320 85% 60%; --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 56%; --destructive-foreground: 0 0% 100%;
+    --border: 270 22% 24%; --input: 270 22% 24%; --ring: 280 90% 64%;
+  }
+}

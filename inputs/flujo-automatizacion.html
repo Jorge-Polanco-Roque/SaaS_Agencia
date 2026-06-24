@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Flujo JSM — Automatización</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #f7f8fa;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    padding: 32px 24px 48px;
+  }
+  .header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .header h1 {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #0d1117;
+    letter-spacing: -0.02em;
+  }
+  .header p {
+    font-size: 0.75rem;
+    color: #6e7681;
+    margin-top: 4px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .legend {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.72rem;
+    color: #444;
+  }
+  .legend-box {
+    width: 18px; height: 14px; border-radius: 3px;
+  }
+
+  /* SWIMLANE TABLE */
+  .swimlane-wrap {
+    overflow-x: auto;
+  }
+  table.swimlane {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    min-width: 900px;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    overflow: hidden;
+  }
+
+  /* Lane header column */
+  td.lane-header {
+    width: 120px;
+    min-width: 100px;
+    vertical-align: middle;
+    text-align: center;
+    padding: 12px 6px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #fff;
+    border-right: 2px solid rgba(255,255,255,0.2);
+    line-height: 1.4;
+  }
+  td.lane-content {
+    padding: 18px 20px;
+    vertical-align: top;
+    border-bottom: 1px solid #eef0f3;
+  }
+  tr:last-child td.lane-content { border-bottom: none; }
+
+  /* Lane colors */
+  .lane-ejecutivo   td.lane-header { background: #1a56db; }
+  .lane-operaciones td.lane-header { background: #0e9f6e; }
+  .lane-compras     td.lane-header { background: #7e3af2; }
+  .lane-finanzas    td.lane-header { background: #e3a008; }
+  .lane-contabilidad td.lane-header { background: #e02424; }
+
+  /* Strip BG */
+  .lane-ejecutivo   td.lane-content { background: #eef3ff; }
+  .lane-operaciones td.lane-content { background: #ecfdf5; }
+  .lane-compras     td.lane-content { background: #f5f3ff; }
+  .lane-finanzas    td.lane-content { background: #fffbeb; }
+  .lane-contabilidad td.lane-content { background: #fff5f5; }
+
+  /* STEP FLOW inside lane */
+  .steps {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .step-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  /* NODE CARDS */
+  .node {
+    border-radius: 8px;
+    padding: 9px 13px;
+    font-size: 0.73rem;
+    line-height: 1.45;
+    min-width: 120px;
+    max-width: 180px;
+    position: relative;
+  }
+  .node strong {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 3px;
+  }
+  .node ul {
+    padding-left: 13px;
+    margin: 0;
+  }
+  .node ul li { margin-bottom: 1px; }
+
+  /* Node types */
+  .n-start {
+    background: #1a56db;
+    color: #fff;
+    border-radius: 24px;
+    padding: 8px 16px;
+    font-weight: 700;
+    font-size: 0.72rem;
+  }
+  .n-end {
+    background: #0e9f6e;
+    color: #fff;
+    border-radius: 24px;
+    padding: 8px 16px;
+    font-weight: 700;
+    font-size: 0.72rem;
+  }
+  .n-process {
+    background: #fff;
+    border: 1.5px solid #d0d5dd;
+    color: #0d1117;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .n-decision {
+    background: #fffbeb;
+    border: 1.5px solid #f5c518;
+    color: #0d1117;
+    border-radius: 12px;
+  }
+  .n-output {
+    background: #ecfdf5;
+    border: 1.5px solid #6ee7b7;
+    color: #065f46;
+  }
+  .n-alert {
+    background: #fff5f5;
+    border: 1.5px solid #fca5a5;
+    color: #7f1d1d;
+  }
+  .n-system {
+    background: #f0f4ff;
+    border: 1.5px dashed #93c5fd;
+    color: #1e3a8a;
+  }
+  .n-auto {
+    background: #faf5ff;
+    border: 2px dashed #c084fc;
+    color: #581c87;
+  }
+
+  /* Arrow between nodes */
+  .arr {
+    font-size: 1.3rem;
+    color: #9ca3af;
+    flex-shrink: 0;
+    line-height: 1;
+    align-self: center;
+  }
+  .arr-down {
+    display: block;
+    text-align: center;
+    font-size: 1.3rem;
+    color: #9ca3af;
+    margin: 4px auto;
+  }
+  .arr-label {
+    font-size: 0.62rem;
+    color: #7e3af2;
+    font-weight: 700;
+    background: #f5f3ff;
+    border-radius: 4px;
+    padding: 1px 5px;
+    align-self: center;
+    white-space: nowrap;
+  }
+
+  /* Auto tag */
+  .auto-tag {
+    display: inline-block;
+    background: #7e3af2;
+    color: #fff;
+    font-size: 0.58rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border-radius: 3px;
+    padding: 1px 5px;
+    margin-bottom: 3px;
+  }
+
+  /* SECTION: notes below table */
+  .notes-section {
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+  }
+  .note-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 14px 16px;
+    border-left: 4px solid #7e3af2;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+    font-size: 0.73rem;
+    color: #1a1a2e;
+    line-height: 1.5;
+  }
+  .note-card h4 {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #7e3af2;
+    font-weight: 800;
+    margin-bottom: 5px;
+  }
+  .note-card.create { border-color: #e3a008; }
+  .note-card.create h4 { color: #e3a008; }
+  .note-card.exists { border-color: #0e9f6e; }
+  .note-card.exists h4 { color: #0e9f6e; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Flujo de Trabajo JSM — Requisición · Compra · Entrega · Facturación</h1>
+  <p>Versión para equipo de automatización · Los nodos con borde punteado morado son candidatos a automatizar</p>
+</div>
+
+<!-- LEYENDA -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-box" style="background:#fff;border:1.5px solid #d0d5dd;"></div> Proceso manual</div>
+  <div class="legend-item"><div class="legend-box" style="background:#fffbeb;border:1.5px solid #f5c518;border-radius:4px;"></div> Decisión</div>
+  <div class="legend-item"><div class="legend-box" style="background:#ecfdf5;border:1.5px solid #6ee7b7;"></div> Salida / Documento</div>
+  <div class="legend-item"><div class="legend-box" style="background:#faf5ff;border:2px dashed #c084fc;"></div> Candidato a automatizar</div>
+  <div class="legend-item"><div class="legend-box" style="background:#fff5f5;border:1.5px solid #fca5a5;"></div> Alerta / Excepción</div>
+  <div class="legend-item"><div class="legend-box" style="background:#f0f4ff;border:1.5px dashed #93c5fd;"></div> Sistema externo</div>
+</div>
+
+<div class="swimlane-wrap">
+<table class="swimlane">
+
+  <!-- ── LANE 1: EJECUTIVO ── -->
+  <tr class="lane-ejecutivo">
+    <td class="lane-header">Ejecutivo</td>
+    <td class="lane-content">
+      <div class="steps">
+        <div class="step-group">
+          <div class="node n-start">INICIO<br><small>Cliente / Fecha</small></div>
+          <span class="arr">→</span>
+          <div class="node n-auto">
+            <span class="auto-tag">auto</span>
+            <strong>① Creación de Tarea</strong>
+            Dispara flujo en Master de Proyectos
+          </div>
+          <span class="arr">→</span>
+          <div class="node n-process">
+            <strong>Requisición</strong>
+            <ul>
+              <li>Oferta + Servicio</li>
+              <li>Producto / Servicio</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </td>
+  </tr>
+
+  <!-- ── LANE 2: OPERACIONES ── -->
+  <tr class="lane-operaciones">
+    <td class="lane-header">Operaciones<br>(Hector / Nivia / Ricardo)</td>
+    <td class="lane-content">
+      <div class="steps">
+        <div class="step-group">
+          <div class="node n-auto">
+            <span class="auto-tag">auto</span>
+            <strong>Pull de Proveedores ★</strong>
+            <ul>
+              <li>Amazon</li>
+              <li>DF · Sorteo · KFC</li>
+            </ul>
+          </div>
+          <span class="arr">→</span>
+          <div class="node n-decision">
+            <strong>Tiempo × días</strong>
+            ¿Cuántos días hábiles?
+          </div>
+          <span class="arr">→</span>
+          <div class="node n-process">
+            <strong>Pago / Dispersión</strong>
+            Según tiempo acordado
+          </div>
+          <span class="arr">→</span>
+          <div class="node n-auto">
+            <span class="auto-tag">auto</span>
+            <strong>Sube a Portal del Cliente</strong>
+            Notifica a Contabilidad
+          </div>
+        </div>
+      </div>
+    </td>
+  </tr>
+
+  <!-- ── LANE 3: COMPRAS / FINANZAS ── -->
+  <tr class="lane-compras">
+    <td class="lane-header">Compras /<br>Finanzas</td>
+    <td class="lane-content">
+      <div class="steps">
+        <div class="step-group">
+          <div class="node n-process">
+            <strong>② Master de Proyectos ★</strong>
+            <ul>
+              <li>Ejecutivo de Cuenta + Cóvac</li>
+              <li>Hijo / RIB</li>
+              <li>Validación #</li>
+              <li>Asignar # al PDF Final</li>
+            </ul>
+          </div>
+          <span class="arr">→</span>
+          <div class="node n-decision">
+            <strong>Resguardo / Cierre</strong>
+            ¿Cliente confirma?
+          </div>
+          <span class="arr">→</span>
+          <div class="node n-output">
+            <strong>PO — CONFIRMA</strong>
+            Orden de compra generada
+          </div>
+          <span class="arr">→</span>
+          <div class="node n-alert">
+            <strong>CONFORMS</strong>
+            Si no confirma → solicitar
+          </div>
+        </div>
+        <span class="arr-down">↓</span>
+        <div class="step-group" style="margin-top:8px;">
+          <div class="node n-decision">
+            <strong>¿Mueve? ★</strong>
+            ¿Cambian fechas o montos?
+          </div>
+          <span class="arr">→</span>
+          <div class="node n-process">
+            <strong>Entregas</strong>
+            <ul>
+              <li>Fijan fechas</li>
+              <li>Sobre o ajustan</li>
+              <li>Diferente cliente</li>
+            </ul>
+          </div>
+          <span class="arr">→</span>
+          <div class="node n-output">
+            <strong>Liquidación</strong>
+            <ul>
+              <li>+ Anticipo / Traspaso</li>
+              <li>– Depósito</li>
+              <li>– Traspaso / Entrega $</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </td>
+  </tr>
+
+  <!-- ── LANE 4: CONTABILIDAD ── -->
+  <tr class="lane-contabilidad">
+    <td class="lane-header">Contabilidad</td>
+    <td class="lane-content">
+      <div class="steps">
+        <div class="step-group">
+          <div class="node n-process">
+            <strong>Recepción Contable</strong>
+            <ul>
+              <li>Recopia documentos</li>
+              <li>Cotizop</li>
+              <li>Informa</li>
+            </ul>
+          </div>
+          <span class="arr">→</span>
+          <div class="node n-output">
+            <strong>JSM Factura</strong>
+            Contabilidad emite factura
+          </div>
+          <span class="arr">→</span>
+          <div class="node n-process">
+            <strong>④ Facturación de Proveedores</strong>
+            <ul>
+              <li>→ JSM o Robos</li>
+              <li>Fix de palosos ★</li>
+              <li>a Cop. Pep</li>
+            </ul>
+          </div>
+          <span class="arr">→</span>
+          <div class="node n-auto">
+            <span class="auto-tag">auto</span>
+            <strong>⑤ Track ID y Fechas ★★</strong>
+            Registro automático de IDs y timestamps
+          </div>
+          <span class="arr">→</span>
+          <div class="node n-end">FIN<br><small>Control Flujo ★★</small></div>
+        </div>
+      </div>
+    </td>
+  </tr>
+
+</table>
+</div>
+
+<!-- NOTAS CLAVE -->
+<div class="notes-section">
+  <div class="note-card create">
+    <h4>★ Se tiene que crear</h4>
+    Pull de Proveedores, Master de Proyectos, resguardo/cierre con cliente, ¿Mueve? (lógica de cambio de fechas/montos), Track ID y Fechas.
+  </div>
+  <div class="note-card exists">
+    <h4>★ Ya existe</h4>
+    Portal del cliente, JSM Factura, proceso de liquidación base.
+  </div>
+  <div class="note-card">
+    <h4>Candidatos prioritarios a automatizar</h4>
+    <ul style="padding-left:14px;">
+      <li>Creación de tarea → trigger en Master de Proyectos</li>
+      <li>Pull de Proveedores según criterios de tiempo/costo</li>
+      <li>Subida automática al portal del cliente</li>
+      <li>Track ID y timestamps al cerrar PO</li>
+    </ul>
+  </div>
+  <div class="note-card" style="border-color:#e02424;">
+    <h4 style="color:#e02424;">Puntos de decisión críticos</h4>
+    <ul style="padding-left:14px;">
+      <li>¿Cliente confirma? → PO CONFIRMA vs CONFORMS</li>
+      <li>¿Mueve? → ajuste de fechas y montos</li>
+      <li>Tiempo × días → define dispersión de pago</li>
+    </ul>
+  </div>
+</div>
+
+</body>
+</html>
