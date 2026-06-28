@@ -91,6 +91,7 @@ Cada etapa es auditable, cada folio es único y cada acción sensible pasa por a
 - 📊 **Gráficas SVG propias** (área, dona, barras, anillos, sparklines) — sin dependencias pesadas.
 - 🔔 **Notificaciones** por email y WhatsApp (Cloud API) con registro.
 - 🔒 **RLS multi-tenant**, RBAC por rol y auditoría completa en bitácora.
+- 💬 **Feedback in-app (Live-Dev)** — botón junto al copiloto para señalar cualquier elemento de la pantalla y abrir una incidencia (GitHub issue con label `live-dev`) sin salir de la app.
 
 ---
 
@@ -105,7 +106,7 @@ Cada etapa es auditable, cada folio es único y cada acción sensible pasa por a
 | Validación | Zod (esquemas compartidos cliente/servidor) |
 | Export | `@react-pdf/renderer` (PDF) · `exceljs` (Excel) |
 | Tests | Vitest (unit) · Playwright (e2e) |
-| Deploy | Vercel + Supabase |
+| Deploy | Google Cloud Run (contenedor, Cloud Build) + Supabase |
 
 ```mermaid
 flowchart LR
@@ -263,12 +264,25 @@ npm run typecheck && npm run lint && npm run test && npm run build
 
 ## Despliegue
 
-Producción en **Vercel + Supabase**. Guía paso a paso (migraciones, variables, cron de cobranza, WhatsApp, backups, rollback) en **[`DEPLOY.md`](./DEPLOY.md)**.
+Producción como **contenedor en Google Cloud Run** (región `us-central1`), con datos en **Supabase**. La imagen se construye con **Cloud Build** desde el [`Dockerfile`](./Dockerfile) (salida `standalone` de Next.js) y se publica en Artifact Registry.
+
+🔗 **En vivo:** <https://jsm-flow-291907890251.us-central1.run.app>
 
 ```bash
-# Healthcheck
+# 1. Build + push de la imagen (las NEXT_PUBLIC_* van como build args)
+gcloud builds submit --config cloudbuild.yaml \
+  --substitutions=_IMAGE=<registro>/jsm-flow:<tag>,_SUPABASE_URL=…,_SUPABASE_ANON_KEY=…,_LIVEDEV_APP_ID=…,_LIVEDEV_TOKEN=…
+
+# 2. Deploy de la imagen al servicio (conserva las env vars de runtime)
+gcloud run deploy jsm-flow --region us-central1 --image <registro>/jsm-flow:<tag>
+
+# 3. Healthcheck
 curl https://<dominio>/api/health
 ```
+
+> **Por qué build args:** Next.js **inlinea las `NEXT_PUBLIC_*`** (Supabase y Live-Dev) en el bundle del navegador durante `next build`, así que deben existir al construir la imagen. Los secretos de runtime (service role, OpenAI, `CRON_SECRET`) viven como variables del servicio en Cloud Run, no en la imagen.
+
+Runbook detallado (migraciones, backups, rollback, WhatsApp, cron de cobranza) en **[`DEPLOY.md`](./DEPLOY.md)**.
 
 ---
 
@@ -286,9 +300,11 @@ lib/
   schemas/           # Zod (fuente de tipos)
   auth/  supabase/   # RBAC, sesión, clientes Supabase
 supabase/
-  migrations/        # 0001…0008 (esquema versionado)
+  migrations/        # 0001…0013 (esquema versionado)
   tests/             # auditoría RLS y stress de consecutivos
 tests/               # Vitest (unit) + e2e (Playwright)
+Dockerfile           # imagen standalone para Cloud Run
+cloudbuild.yaml      # build de la imagen (Cloud Build)
 CLAUDE.md            # plan vivo y bitácora por fase
 DEPLOY.md            # runbook de despliegue
 ```
