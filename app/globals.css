@@ -156,3 +156,51 @@
     --border: 270 22% 24%; --input: 270 22% 24%; --ring: 280 90% 64%;
   }
 }
+
+/* ── Widget de feedback Live-Dev (§16) ─────────────────────────────────────
+   El bundle externo inyecta su propio botón `.livedev-toggle` en la esquina
+   inferior derecha, justo donde vive el Copiloto. Lo recolocamos a su izquierda
+   y lo hacemos llamativo (violeta). `button.livedev-toggle` + !important ganan
+   sobre el <style> que inyecta el widget sin importar el orden de carga. */
+button.livedev-toggle {
+  right: 168px !important;
+  bottom: 20px !important;
+  z-index: 60 !important;
+  background: linear-gradient(135deg, #7c3aed, #c026d3) !important;
+  color: #fff !important;
+  font: 600 13px ui-sans-serif, system-ui, sans-serif !important;
+  padding: 0 18px !important;
+  height: 48px !important;
+  border-radius: 9999px !important;
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.45) !important;
+  transition: transform 0.15s ease !important;
+}
+button.livedev-toggle:hover {
+  transform: scale(1.05) !important;
+}
+/* Anillo pulsante para que destaque ("muy llamativo") */
+button.livedev-toggle::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 9999px;
+  border: 2px solid rgba(124, 58, 237, 0.6);
+  animation: livedev-pulse 2s ease-out infinite;
+  pointer-events: none;
+}
+@keyframes livedev-pulse {
+  0% { opacity: 0.7; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.25); }
+}
+@media (prefers-reduced-motion: reduce) {
+  button.livedev-toggle,
+  button.livedev-toggle:hover { transition: none !important; }
+  button.livedev-toggle::after { animation: none; opacity: 0; }
+}
+/* Pantallas angostas: lo subimos encima del Copiloto para que no se encimen */
+@media (max-width: 520px) {
+  button.livedev-toggle {
+    right: 20px !important;
+    bottom: 76px !important;
+  }
+}

@@ -18,7 +18,7 @@ export function DispersionForm({ ocId, total }: { ocId: string; total: number })
   const [diasEntre, setDiasEntre] = useState(30);
 
   const preview = useMemo(
-    () => calcularDispersion(total, { parcialidades, diasEntre, fechaInicio: "—" }),
+    () => calcularDispersion(total, { parcialidades, diasEntre }),
     [total, parcialidades, diasEntre]
   );
 

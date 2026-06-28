@@ -22,7 +22,8 @@ export default function LoginPage() {
       <div className="absolute right-5 top-5">
         <ThemeSwitcher />
       </div>
-      <Card className="w-full max-w-sm">
+      <div className="flex w-full max-w-sm flex-col items-center gap-4">
+      <Card className="w-full">
         <CardHeader>
           <p className="text-xs font-semibold uppercase tracking-widest text-primary">
             JSM Flow
@@ -69,6 +70,22 @@ export default function LoginPage() {
           </form>
         </CardContent>
       </Card>
+
+      <div className="w-full rounded-lg border border-dashed bg-card/50 p-3 text-xs leading-relaxed text-muted-foreground">
+        <p className="mb-1 flex items-center gap-1.5 font-medium text-foreground">
+          <span
+            className="inline-block h-2.5 w-2.5 rounded-full"
+            style={{ background: "linear-gradient(135deg,#7c3aed,#c026d3)" }}
+          />
+          Esta versión incluye Live-Dev
+        </p>
+        Dentro de la app verás un botón{" "}
+        <span className="font-medium text-foreground">● Live-Dev</span> junto al
+        Copiloto. Te deja señalar cualquier parte de la pantalla y enviar un
+        comentario: se convierte en una tarea para el equipo. Úsalo si algo no se
+        ve bien o no funciona.
+      </div>
+      </div>
     </main>
   );
 }

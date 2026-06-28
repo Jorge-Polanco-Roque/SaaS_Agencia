@@ -3,6 +3,8 @@ import { can, ROLE_LABELS } from "@/lib/auth/rbac";
 import { NAV_ITEMS } from "@/lib/nav";
 import { AppShell } from "@/components/app-shell";
 import { CopilotoPanel } from "@/components/copiloto/copiloto-panel";
+import { LiveDevOverlayLoader } from "@/components/livedev-overlay-loader";
+import { LiveDevOnboarding } from "@/components/livedev-onboarding";
 
 export default async function AppLayout({
   children,
@@ -22,6 +24,12 @@ export default async function AppLayout({
         {children}
       </AppShell>
       <CopilotoPanel />
+      <LiveDevOverlayLoader
+        appId={process.env.NEXT_PUBLIC_LIVEDEV_APP_ID}
+        token={process.env.NEXT_PUBLIC_LIVEDEV_TOKEN}
+        enabled={process.env.NEXT_PUBLIC_LIVEDEV_ENABLED !== "false"}
+      />
+      <LiveDevOnboarding />
     </>
   );
 }

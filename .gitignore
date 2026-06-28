@@ -23,6 +23,9 @@ yarn-error.log*
 # env
 .env
 .env*.local
+.env.cloud
+.env.local.bak
+*.bak
 
 # supabase
 supabase/.branches

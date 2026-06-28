@@ -27,14 +27,21 @@ export interface OpcionesDispersion {
   etiqueta?: string;
 }
 
-function isoSumarDias(iso: string, dias: number): string {
-  const d = new Date(`${iso}T00:00:00Z`);
-  d.setUTCDate(d.getUTCDate() + dias);
-  return d.toISOString().slice(0, 10);
-}
-
 function hoyIso(): string {
   return new Date().toISOString().slice(0, 10);
+}
+
+/** Normaliza una fecha ISO; si es inválida o ausente, devuelve hoy. */
+function isoValido(iso?: string): string {
+  if (!iso) return hoyIso();
+  const d = new Date(`${iso}T00:00:00Z`);
+  return Number.isNaN(d.getTime()) ? hoyIso() : iso;
+}
+
+function isoSumarDias(iso: string, dias: number): string {
+  const d = new Date(`${isoValido(iso)}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + dias);
+  return d.toISOString().slice(0, 10);
 }
 
 /**
@@ -46,7 +53,7 @@ export function calcularDispersion(
 ): ParcialidadDispersion[] {
   const total = round2(Math.max(0, montoTotal));
   const etiqueta = opts.etiqueta ?? "Parcialidad";
-  const fechaInicio = opts.fechaInicio ?? hoyIso();
+  const fechaInicio = isoValido(opts.fechaInicio);
   const diasEntre = Number.isFinite(opts.diasEntre)
     ? Math.max(0, Math.floor(opts.diasEntre as number))
     : 30;

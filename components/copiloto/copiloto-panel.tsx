@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { Markdown } from "./markdown";
 
 interface Msg {
   role: "user" | "assistant" | "system";
@@ -136,13 +137,13 @@ export function CopilotoPanel() {
                 className={cn(
                   "max-w-[85%] rounded-lg px-3 py-2 text-sm",
                   m.role === "user"
-                    ? "ml-auto bg-primary text-primary-foreground"
+                    ? "ml-auto whitespace-pre-wrap bg-primary text-primary-foreground"
                     : m.role === "system"
                       ? "mx-auto bg-secondary text-xs text-muted-foreground"
                       : "bg-secondary"
                 )}
               >
-                {m.text}
+                {m.role === "assistant" ? <Markdown>{m.text}</Markdown> : m.text}
               </div>
             ))}
 
