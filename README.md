@@ -323,6 +323,7 @@ DEPLOY.md            # runbook de despliegue
 | 5 · Hardening + Deploy | ✅ |
 | 6 · Capa visual (gráficas + 7 temas) | ✅ |
 | 7 · Copiloto de IA por sección (piloto) | ✅ |
+| — Siguiente: **conexión al MCP de la agencia** (operar JSM Flow desde clientes de IA vía PATs `jsmpat_`, con RLS por usuario) | 🔜 |
 | — Siguiente: streaming, Copiloto global (Deep Agents), bot del portal, evals | 🔜 |
 
 El detalle por fase y la bitácora viva están en **[`CLAUDE.md`](./CLAUDE.md)**.
